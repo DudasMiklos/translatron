@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
 class FileStorage {
+  ///Method loads the selected [Locale] from Assets, and updates it if there is any newer version via api
   static Future<Map<String, String>?> loadLanguage(Locale locale) async {
     final Directory baseDirectory = await getApplicationDocumentsDirectory();
 
@@ -34,6 +35,7 @@ class FileStorage {
     }
   }
 
+  ///Method writes a json [String] to the selected [Locale], in the [ApplicationDocumentsDirectory]
   static Future<void> saveLanguage(Locale locale, String jsonAsString) async {
     final Directory baseDirectory = await getApplicationDocumentsDirectory();
 
@@ -52,6 +54,7 @@ class FileStorage {
     }
   }
 
+  ///Method converts [String] to [Map<String, String>] and returns it
   static Map<String, String> _convertStringToJson(String jsonAsString) {
     Map<String, String>? jsonStrings;
 
