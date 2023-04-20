@@ -1,34 +1,117 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# Welcome to Translatron!
+**##!BETA  VERSION - NOT FOR LIVE OR PROD USAGE!**
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages).
+# Description
+Comming soon...
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages).
--->
+# Usage
+Comming soon...
 
-Under construction
-
-## Features
-
-Under construction
-
-## Getting started
-
-Under construction
-
-## Usage
-
-Under construction
-
+## Initilazion
+#### Basic Initilazion
 ```dart
-const like = 'sample';
+    void  main() async {
+		await  Translatron.init(
+			hostname:  "https://example.com",
+			versionPath:  "/api/translation/version",
+			translationsPath:  "/api/translation/translations",
+		);
+	]);
+```
+#### Initilazion with custom supported languages
+```dart
+    void  main() async {
+		await  Translatron.init(
+			hostname:  "https://example.com",
+			versionPath:  "/api/translation/version",
+			translationsPath:  "/api/translation/translations",
+			supportedLocales:  const [
+				Locale('hu'),
+				Locale('en'),
+			],
+		);
+	]);
+```
+	
+#### Initilazion with custom supported languages and custom api headers
+```dart
+    void  main() async {
+		await  Translatron.init(
+			hostname:  "https://example.com",
+			versionPath:  "/api/translation/version",
+			translationsPath:  "/api/translation/translations",
+			supportedLocales: const [
+				Locale('hu'),
+				Locale('en'),
+			],
+			apiHeaders: const {
+				"Authorization" : "Bearer $token",
+				"Content-Type: application/json"
+			}
+		);
+	]);
+```
+	
+#### Add the custom delegate to app
+```dart
+return  MaterialApp.router(
+	title:  'DemoApp',
+	localizationsDelegates:  const [
+		Translatron.delegate,
+		GlobalMaterialLocalizations.delegate,
+		GlobalWidgetsLocalizations.delegate,
+		GlobalCupertinoLocalizations.delegate,
+	],
+	//To change to your state management
+	locale: Provider.of<LocaleProvider>(context,  listen:  true).getlocale, 
+	supportedLocales:  Translatron.getSupportedLocales,
+);
 ```
 
-## Additional information
+#### Demo provider
+```dart
+class  LocaleProvider  with  ChangeNotifier {
+	Locale?  locale  =  Translatron.getSelectedLanguageLocale;
+	
+	Locale?  get  getlocale {
+		return  locale;
+	} 
 
-Under construction
+	void  changeLocale(Locale  newLocale) {
+		locale  =  newLocale;
+		Translatron.setSelectedLanguageLocale  =  locale!;
+		notifyListeners();
+	}
+}
+```
+
+#### Language change with provider
+```dart
+Provider.of<LocaleProvider>(context,  listen:  false)
+.changeLocale(const  Locale('hu',  'HU'));
+```
+
+## Functions
+#### Translate, returns string
+```dart
+Translatron.of(context)!.translate("translation.key");
+```
+#### Return if language is active, returns bool
+```dart
+Translatron.isLanguageActice('en');
+```
+
+#### Returns the supported locales in **List of Locale**
+```dart
+Translatron.getSupportedLocales;
+```
+
+#### Returns the selected Language Locale, in some cases nullable
+```dart
+Translatron.getSelectedLanguageLocale;
+```
+
+#### Sets the selected Language Locale, in some cases nullable
+```dart
+Translatron.setSelectedLanguageLocale  =  locale!;
+```
