@@ -12,7 +12,7 @@ class TranslatronDelegate extends LocalizationsDelegate<Translatron> {
   /// method supports the given `locale`'s language.
   @override
   bool isSupported(Locale locale) {
-    return ['hu', 'en'].contains(locale.languageCode);
+    return Translatron.getSupportedLocales.contains(locale);
   }
 
   /// Start loading the resources for `locale`. The returned future completes
