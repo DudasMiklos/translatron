@@ -32,9 +32,6 @@ class Translatron {
   ///Stores the custom api headers inside [Map<String, String>?]
   static late Map<String, String>? _apiHeaders;
 
-  ///Stores if the project has a webserver
-  static bool _hasWebserver = true;
-
   ///Notehing to see here
   Translatron(this.locale);
 
@@ -120,7 +117,6 @@ class Translatron {
     _translationsPath = translationsPath;
     _supportedLocales = supportedLocales;
     _apiHeaders = apiHeaders;
-    _hasWebserver = hasWebserver;
     await LocalStorage.loadLanguage();
     if (hasWebserver) {
       final bool isNewVersionAvailable = await Utils.isNewVersionAvailable();

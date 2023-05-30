@@ -1,3 +1,7 @@
+## 0.0.4
+
+* Offline working added for development without a webserver
+
 ## 0.0.3
 
 * Code comments added, and bugfixes

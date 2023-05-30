@@ -1,12 +1,12 @@
 name: translatron
 description: !BETA VERSION - NOT FOR LIVE OR PROD USAGE!  A package for translations, from api calls. Only use if your backend team can provide the nedded api urls!
-version: 0.0.3
+version: 0.0.4
 homepage: https://dudasmiklos.com/
 repository: https://github.com/DudasMiklos/translatron
 documentation: https://dudasmiklos.com/
 
 environment:
-  sdk: '>=2.19.2 <3.0.0'
+  sdk: '>=2.19.2 <4.0.0'
   flutter: ">=1.17.0"
 
 dependencies:
