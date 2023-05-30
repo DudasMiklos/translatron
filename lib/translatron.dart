@@ -32,6 +32,9 @@ class Translatron {
   ///Stores the custom api headers inside [Map<String, String>?]
   static late Map<String, String>? _apiHeaders;
 
+  ///Stores if the project has a webserver
+  static bool _hasWebserver = true;
+
   ///Notehing to see here
   Translatron(this.locale);
 
@@ -110,22 +113,26 @@ class Translatron {
     required String translationsPath,
     List<Locale> supportedLocales = const [Locale('hu')],
     Map<String, String>? apiHeaders,
+    bool hasWebserver = true,
   }) async {
     _hostname = hostname;
     _versionPath = versionPath;
     _translationsPath = translationsPath;
     _supportedLocales = supportedLocales;
     _apiHeaders = apiHeaders;
+    _hasWebserver = hasWebserver;
     await LocalStorage.loadLanguage();
-    final bool isNewVersionAvailable = await Utils.isNewVersionAvailable();
-    if (isNewVersionAvailable) {
-      Map<String, dynamic> magick = await Api.fetchTranslations();
-      for (var locale in supportedLocales) {
-        FileStorage.saveLanguage(
-            locale, jsonEncode(magick["data"][locale.languageCode]));
+    if (hasWebserver) {
+      final bool isNewVersionAvailable = await Utils.isNewVersionAvailable();
+      if (isNewVersionAvailable) {
+        Map<String, dynamic> magick = await Api.fetchTranslations();
+        for (var locale in supportedLocales) {
+          FileStorage.saveLanguage(
+              locale, jsonEncode(magick["data"][locale.languageCode]));
+        }
       }
+      LocalStorage.presistLanguageVersion(Utils.getTranslationVersion);
     }
-    LocalStorage.presistLanguageVersion(Utils.getTranslationVersion);
   }
 
   ///Stores the localized strings
