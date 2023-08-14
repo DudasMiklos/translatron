@@ -3,35 +3,50 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:translatron/translatron.dart';
 
 class FileStorage {
   ///Method loads the selected [Locale] from Assets, and updates it if there is any newer version via api
   static Future<Map<String, String>?> loadLanguage(Locale locale) async {
     final Directory baseDirectory = await getApplicationDocumentsDirectory();
 
-    //Cheking if lang file exists
-    bool fileExists =
-        await File('${baseDirectory.path}/lang/${locale.languageCode}.json')
-            .exists();
-    if (fileExists) {
-      //If exists, read it and convert it into map, return the value
-      File file =
-          File('${baseDirectory.path}/lang/${locale.languageCode}.json');
-      String jsonAsString = await file.readAsString();
-      return _convertStringToJson(jsonAsString);
-    } else {
+    //Overwrite the default loading, if in debug overvrite the local assets
+    if (Translatron.reLoadAtStart == true) {
       //if it doesnt exists, read the default asset file, save it locally and convert it into map, return the value
       String jsonAsString =
           await rootBundle.loadString("lang/${locale.languageCode}.json");
 
-      //TODOCHECHK FOR UPDATE
-      //TODOREFRESH IF UPDATE AVAILABLE
       File file =
           await File('${baseDirectory.path}/lang/${locale.languageCode}.json')
               .create(recursive: true); //try cach to add
       file.writeAsString(jsonAsString);
       Map<String, String> convertedJson = _convertStringToJson(jsonAsString);
       return convertedJson;
+    } else {
+      //Cheking if lang file exists
+      bool fileExists =
+          await File('${baseDirectory.path}/lang/${locale.languageCode}.json')
+              .exists();
+      if (fileExists) {
+        //If exists, read it and convert it into map, return the value
+        File file =
+            File('${baseDirectory.path}/lang/${locale.languageCode}.json');
+        String jsonAsString = await file.readAsString();
+        return _convertStringToJson(jsonAsString);
+      } else {
+        //if it doesnt exists, read the default asset file, save it locally and convert it into map, return the value
+        String jsonAsString =
+            await rootBundle.loadString("lang/${locale.languageCode}.json");
+
+        //TODOCHECHK FOR UPDATE
+        //TODOREFRESH IF UPDATE AVAILABLE
+        File file =
+            await File('${baseDirectory.path}/lang/${locale.languageCode}.json')
+                .create(recursive: true); //try cach to add
+        file.writeAsString(jsonAsString);
+        Map<String, String> convertedJson = _convertStringToJson(jsonAsString);
+        return convertedJson;
+      }
     }
   }
 

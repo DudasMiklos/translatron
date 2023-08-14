@@ -32,6 +32,9 @@ class Translatron {
   ///Stores the custom api headers inside [Map<String, String>?]
   static late Map<String, String>? _apiHeaders;
 
+  ///Stores the reLoadAtStart[bool] for reload assets at start
+  static late bool _reLoadAtStart;
+
   ///Notehing to see here
   Translatron(this.locale);
 
@@ -52,6 +55,11 @@ class Translatron {
   /// Retruns the selected [Locale]
   static Locale? get getSelectedLanguageLocale {
     return _selectedLocale;
+  }
+
+  /// Retruns the reLoadAtStart [bool]
+  static bool? get reLoadAtStart {
+    return _reLoadAtStart;
   }
 
   /// Retruns the selected language code, example **hu** or **en**
@@ -111,12 +119,14 @@ class Translatron {
     List<Locale> supportedLocales = const [Locale('hu')],
     Map<String, String>? apiHeaders,
     bool hasWebserver = true,
+    bool reLoadAtStart = false,
   }) async {
     _hostname = hostname;
     _versionPath = versionPath;
     _translationsPath = translationsPath;
     _supportedLocales = supportedLocales;
     _apiHeaders = apiHeaders;
+    _reLoadAtStart = reLoadAtStart;
     await LocalStorage.loadLanguage();
     if (hasWebserver) {
       final bool isNewVersionAvailable = await Utils.isNewVersionAvailable();
