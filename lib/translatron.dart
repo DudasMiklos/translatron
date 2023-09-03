@@ -70,7 +70,7 @@ class Translatron {
   /// Sets the selected language [Locale]
   /// Excepts [Locale]
   static set setSelectedLanguageLocale(Locale newLocale) {
-    LocalStorage.presistLanguage(newLocale.languageCode.toLowerCase());
+    LocalStorage.persistLanguage(newLocale.languageCode.toLowerCase());
     _selectedLocale = newLocale;
   }
 
@@ -137,7 +137,7 @@ class Translatron {
               locale, jsonEncode(magick["data"][locale.languageCode]));
         }
       }
-      LocalStorage.presistLanguageVersion(Utils.getTranslationVersion);
+      LocalStorage.persistLanguageVersion(Utils.getTranslationVersion);
     }
   }
 
