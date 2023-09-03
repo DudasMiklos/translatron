@@ -1,5 +1,11 @@
 ## 0.0.6
 
+* Misstype fixed
+* Shared preferences key fixed
+* Dependecies updated
+
+## 0.0.6
+
 * reLoadAtStart parameter added -> this allow you to reload the assets files, with hot-restart or regular restart
 
 ## 0.0.5
