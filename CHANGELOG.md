@@ -1,3 +1,7 @@
+## 0.1.1
+
+* dart run translatron --unused command added
+
 ## 0.1.0
 
 * Misstype fixed
