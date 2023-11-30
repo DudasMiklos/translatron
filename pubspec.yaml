@@ -6,8 +6,11 @@ repository: https://github.com/DudasMiklos/translatron
 documentation: https://dudasmiklos.com/
 
 environment:
-  sdk: '>=2.19.2 <4.0.0'
+  sdk: '>=3.2.0 <4.0.0'
   flutter: ">=1.17.0"
+
+executables:
+  translatron: translatron
 
 dependencies:
   flutter:
@@ -15,6 +18,7 @@ dependencies:
   http: ^1.1.2
   path_provider: ^2.1.1
   shared_preferences: ^2.2.2
+  args: ^2.4.2
 
 dev_dependencies:
   flutter_test:
