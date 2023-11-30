@@ -19,6 +19,8 @@ class UnusedHelper {
 
     print(
         "\x1B[36m[NOTE]: Please \x1B[1mNOTE\x1B[0m\x1B[36m this command only runs on the JSON files, it \x1B[1mDOES NOT\x1B[0m\x1B[36m run on the device files!\x1B[36m\n");
+    print(
+        "\x1B[36m[NOTE]: Please \x1B[1mNOTE\x1B[0m\x1B[36m this commands interface \x1B[1mDO NOT MARKS _{languageCode}\x1B[0m\x1B[36m ending keys while the language key is present as a file! (example: \x1B[1mselect_language_hu\x1B[0m\x1B[36m wont be marked as unused while there is a \x1B[1mhu.json\x1B[0m\x1B[36m file)\x1B[36m\n");
 
     await for (var entity in Directory('lib').list(recursive: true)) {
       if (entity is File) {
@@ -57,19 +59,23 @@ class UnusedHelper {
         }
         String jsonString = await fileEntity.readAsString();
         Map<String, String> jsonMap = _convertStringToJson(jsonString);
-
         for (var jsonKey in jsonMap.keys) {
-          bool isKeyUsed = await isKeyUsedInLib(jsonKey);
-          if (!isKeyUsed) {
-            if (unusedStringMap.containsKey(jsonKey)) {
-              unusedStringMap.update(jsonKey, (existingLanguages) {
-                if (!existingLanguages.contains(languageCode)) {
-                  existingLanguages.add(languageCode);
-                }
-                return existingLanguages;
-              });
-            } else {
-              unusedStringMap[jsonKey] = [languageCode];
+          // Check if the key ends with any of the language codes
+          bool endsWithLanguageCode = detectedLanguages
+              .any((lang) => jsonKey.endsWith("_${lang.toLowerCase()}"));
+          if (!endsWithLanguageCode) {
+            bool isKeyUsed = await isKeyUsedInLib(jsonKey);
+            if (!isKeyUsed) {
+              if (unusedStringMap.containsKey(jsonKey)) {
+                unusedStringMap.update(jsonKey, (existingLanguages) {
+                  if (!existingLanguages.contains(languageCode)) {
+                    existingLanguages.add(languageCode);
+                  }
+                  return existingLanguages;
+                });
+              } else {
+                unusedStringMap[jsonKey] = [languageCode];
+              }
             }
           }
         }

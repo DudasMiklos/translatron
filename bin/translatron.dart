@@ -47,3 +47,6 @@ void main(List<String> arguments) {
 }
 
 // Egy funkció ami kiirja hogy van e unused elem , egy ami csinál statisztikát hogy hányszór van használva, és egy ami chekelni hogy az összes nyelven megvan-e,  --unused --statistic --check
+// warning to /n
+
+//TODO TOFIX dont count then the varriable end with _language code

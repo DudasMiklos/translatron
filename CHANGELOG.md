@@ -1,3 +1,7 @@
+## 0.1.2
+
+* dart run translatron --unused command fixed, now wont count _hu elements as unused
+
 ## 0.1.1
 
 * dart run translatron --unused command added
