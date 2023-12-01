@@ -1,4 +1,5 @@
 import 'package:args/args.dart';
+import 'package:translatron/command/helpers/stat_helper.dart';
 import 'package:translatron/command/helpers/unused_helper.dart';
 import 'package:translatron/command/printers/error_printer.dart';
 
@@ -14,7 +15,13 @@ void main(List<String> arguments) {
       'unused',
       negatable: true,
       abbr: "u",
-      defaultsTo: true,
+      defaultsTo: false,
+    )
+    ..addFlag(
+      'stat',
+      negatable: true,
+      abbr: "s",
+      defaultsTo: false,
     );
 
   try {
@@ -22,6 +29,8 @@ void main(List<String> arguments) {
     if (argResults.arguments.length == 1) {
       if (argResults["unused"]) {
         UnusedHelper.runUnused();
+      } else if (argResults["stat"]) {
+        StatHelper.runStat();
       } else if (argResults["help"]) {
         print("HELP");
       }
@@ -46,7 +55,7 @@ void main(List<String> arguments) {
   }
 }
 
-// Egy funkció ami kiirja hogy van e unused elem , egy ami csinál statisztikát hogy hányszór van használva, és egy ami chekelni hogy az összes nyelven megvan-e,  --unused --statistic --check
+// Egy funkció ami kiirja hogy van e unused elem , egy ami csinál statisztikát hogy hányszór van használva, és egy ami chekelni hogy az összes nyelven megvan-e,  --unused --stat --check
 // warning to /n
 
 //TODO TOFIX dont count then the varriable end with _language code

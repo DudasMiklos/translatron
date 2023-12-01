@@ -2,18 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 class UnusedHelper {
-  static Future<bool> isKeyUsedInLib(String key) async {
-    await for (var entity in Directory('lib').list(recursive: true)) {
-      if (entity is File) {
-        String content = await entity.readAsString();
-        if (content.contains(key)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
   static Future<void> runUnused() async {
     int fileCountToSearch = 0;
 
@@ -64,7 +52,7 @@ class UnusedHelper {
           bool endsWithLanguageCode = detectedLanguages
               .any((lang) => jsonKey.endsWith("_${lang.toLowerCase()}"));
           if (!endsWithLanguageCode) {
-            bool isKeyUsed = await isKeyUsedInLib(jsonKey);
+            bool isKeyUsed = await _isKeyUsedInLib(jsonKey);
             if (!isKeyUsed) {
               if (unusedStringMap.containsKey(jsonKey)) {
                 unusedStringMap.update(jsonKey, (existingLanguages) {
@@ -105,6 +93,18 @@ class UnusedHelper {
     }
     print(
         "\n\x1B[32m[SUCCESS]:🔥 Command excetued succesfully! Bye 👋 \x1B[32m\n");
+  }
+
+  static Future<bool> _isKeyUsedInLib(String key) async {
+    await for (var entity in Directory('lib').list(recursive: true)) {
+      if (entity is File) {
+        String content = await entity.readAsString();
+        if (content.contains(key)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   ///Method converts [String] to [Map<String, String>] and returns it
