@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:translatron/exception/exception_handler.dart';
+
 class CheckHelper {
   static Future<void> runCheck() async {
     int fileCountToSearch = 0;
@@ -9,10 +11,14 @@ class CheckHelper {
         "\x1B[36m[NOTE]: Please \x1B[1mNOTE\x1B[0m\x1B[36m this command only runs on the JSON files, it \x1B[1mDOES NOT\x1B[0m\x1B[36m run on the device files!\x1B[36m\n");
     print("\x1B[35m[INFO]: Searching for project files\x1B[35m");
 
-    await for (var entity in Directory('lib').list(recursive: true)) {
-      if (entity is File) {
-        fileCountToSearch++;
+    try {
+      await for (var entity in Directory('lib').list(recursive: true)) {
+        if (entity is File) {
+          fileCountToSearch++;
+        }
       }
+    } catch (e) {
+      ExceptionHandler.returnException(e);
     }
 
     print(
@@ -24,20 +30,24 @@ class CheckHelper {
     List<String> detectedLanguages = [];
     Map<String, String> notAllowedLineBreakList = {};
 
-    await for (var fileEntity in Directory('lang').list(recursive: true)) {
-      if (fileEntity is File) {
-        String languageCode =
-            fileEntity.path.split('/').last.split('.').first.toUpperCase();
-        if (!detectedLanguages.contains(languageCode)) {
-          detectedLanguages.add(languageCode);
-        }
-        String jsonString = await fileEntity.readAsString();
-        Map<String, String> jsonMap = _convertStringToJson(jsonString);
+    try {
+      await for (var fileEntity in Directory('lang').list(recursive: true)) {
+        if (fileEntity is File) {
+          String languageCode =
+              fileEntity.path.split('/').last.split('.').first.toUpperCase();
+          if (!detectedLanguages.contains(languageCode)) {
+            detectedLanguages.add(languageCode);
+          }
+          String jsonString = await fileEntity.readAsString();
+          Map<String, String> jsonMap = _convertStringToJson(jsonString);
 
-        for (var jsonKey in jsonMap.keys) {
-          uniqueKeys.add(jsonKey);
+          for (var jsonKey in jsonMap.keys) {
+            uniqueKeys.add(jsonKey);
+          }
         }
       }
+    } catch (e) {
+      ExceptionHandler.returnException(e);
     }
     print("\x1B[35m[INFO]: Searching for language files\x1B[35m");
     print(
@@ -49,40 +59,48 @@ class CheckHelper {
     print(
         "\x1B[36m[NOTE]: Checking keys usages in project files ...\x1B[36m\n");
 
-    for (var jsonKey in uniqueKeys) {
-      int usageCount = await _getUsageCount(jsonKey);
-      if (usageCount > 5) {
-        //TODO 10
-        keysTooMuchUsedList[jsonKey] = usageCount;
-      }
-      bool endsWithLanguageCode = detectedLanguages
-          .any((lang) => jsonKey.endsWith("_${lang.toLowerCase()}"));
-      if (!endsWithLanguageCode) {
-        if (usageCount == 0) {
-          unusedKeys.add(jsonKey);
+    try {
+      for (var jsonKey in uniqueKeys) {
+        int usageCount = await _getUsageCount(jsonKey);
+        if (usageCount > 5) {
+          //TODO 10
+          keysTooMuchUsedList[jsonKey] = usageCount;
+        }
+        bool endsWithLanguageCode = detectedLanguages
+            .any((lang) => jsonKey.endsWith("_${lang.toLowerCase()}"));
+        if (!endsWithLanguageCode) {
+          if (usageCount == 0) {
+            unusedKeys.add(jsonKey);
+          }
         }
       }
+    } catch (e) {
+      ExceptionHandler.returnException(e);
     }
 
     print(
         "\x1B[36m[NOTE]: Checking for forbidden '[backslash]n' characters ...\x1B[36m\n");
 
-    await for (var fileEntity in Directory('lang').list(recursive: true)) {
-      if (fileEntity is File) {
-        String languageCode =
-            fileEntity.path.split('/').last.split('.').first.toUpperCase();
-        if (!detectedLanguages.contains(languageCode)) {
-          detectedLanguages.add(languageCode);
-        }
-        String jsonString = await fileEntity.readAsString();
-        Map<String, String> jsonMap = _convertStringToJson(jsonString);
+    try {
+      await for (var fileEntity in Directory('lang').list(recursive: true)) {
+        if (fileEntity is File) {
+          String languageCode =
+              fileEntity.path.split('/').last.split('.').first.toUpperCase();
+          if (!detectedLanguages.contains(languageCode)) {
+            detectedLanguages.add(languageCode);
+          }
+          String jsonString = await fileEntity.readAsString();
+          Map<String, String> jsonMap = _convertStringToJson(jsonString);
 
-        for (var jsonKey in jsonMap.keys) {
-          if (jsonMap[jsonKey]!.contains('\n')) {
-            notAllowedLineBreakList[jsonKey] = languageCode;
+          for (var jsonKey in jsonMap.keys) {
+            if (jsonMap[jsonKey]!.contains('\n')) {
+              notAllowedLineBreakList[jsonKey] = languageCode;
+            }
           }
         }
       }
+    } catch (e) {
+      ExceptionHandler.returnException(e);
     }
 
     print(
@@ -90,47 +108,51 @@ class CheckHelper {
 
     Map<String, List<String>> unusedMissingKeyMap = {};
     Map<String, List<String>> usedMissingKeyMap = {};
-    await for (var fileEntity in Directory('lang').list(recursive: true)) {
-      if (fileEntity is File) {
-        String languageCode =
-            fileEntity.path.split('/').last.split('.').first.toUpperCase();
-        if (!detectedLanguages.contains(languageCode)) {
-          detectedLanguages.add(languageCode);
-        }
-        String jsonString = await fileEntity.readAsString();
-        Map<String, String> jsonMap = _convertStringToJson(jsonString);
-        for (var jsonKey in jsonMap.keys) {
-          // Check if the key ends with any of the language codes
-          bool endsWithLanguageCode = detectedLanguages
-              .any((lang) => jsonKey.endsWith("_${lang.toLowerCase()}"));
-          if (!endsWithLanguageCode) {
-            bool isKeyUsed = await _isKeyUsedInLib(jsonKey);
-            if (!isKeyUsed) {
-              if (unusedMissingKeyMap.containsKey(jsonKey)) {
-                unusedMissingKeyMap.update(jsonKey, (existingLanguages) {
-                  if (!existingLanguages.contains(languageCode)) {
-                    existingLanguages.add(languageCode);
-                  }
-                  return existingLanguages;
-                });
+    try {
+      await for (var fileEntity in Directory('lang').list(recursive: true)) {
+        if (fileEntity is File) {
+          String languageCode =
+              fileEntity.path.split('/').last.split('.').first.toUpperCase();
+          if (!detectedLanguages.contains(languageCode)) {
+            detectedLanguages.add(languageCode);
+          }
+          String jsonString = await fileEntity.readAsString();
+          Map<String, String> jsonMap = _convertStringToJson(jsonString);
+          for (var jsonKey in jsonMap.keys) {
+            // Check if the key ends with any of the language codes
+            bool endsWithLanguageCode = detectedLanguages
+                .any((lang) => jsonKey.endsWith("_${lang.toLowerCase()}"));
+            if (!endsWithLanguageCode) {
+              bool isKeyUsed = await _isKeyUsedInLib(jsonKey);
+              if (!isKeyUsed) {
+                if (unusedMissingKeyMap.containsKey(jsonKey)) {
+                  unusedMissingKeyMap.update(jsonKey, (existingLanguages) {
+                    if (!existingLanguages.contains(languageCode)) {
+                      existingLanguages.add(languageCode);
+                    }
+                    return existingLanguages;
+                  });
+                } else {
+                  unusedMissingKeyMap[jsonKey] = [languageCode];
+                }
               } else {
-                unusedMissingKeyMap[jsonKey] = [languageCode];
-              }
-            } else {
-              if (usedMissingKeyMap.containsKey(jsonKey)) {
-                usedMissingKeyMap.update(jsonKey, (existingLanguages) {
-                  if (!existingLanguages.contains(languageCode)) {
-                    existingLanguages.add(languageCode);
-                  }
-                  return existingLanguages;
-                });
-              } else {
-                usedMissingKeyMap[jsonKey] = [languageCode];
+                if (usedMissingKeyMap.containsKey(jsonKey)) {
+                  usedMissingKeyMap.update(jsonKey, (existingLanguages) {
+                    if (!existingLanguages.contains(languageCode)) {
+                      existingLanguages.add(languageCode);
+                    }
+                    return existingLanguages;
+                  });
+                } else {
+                  usedMissingKeyMap[jsonKey] = [languageCode];
+                }
               }
             }
           }
         }
       }
+    } catch (e) {
+      ExceptionHandler.returnException(e);
     }
 
     unusedKeys.forEach((key) {
@@ -139,12 +161,12 @@ class CheckHelper {
 
     keysTooMuchUsedList.forEach((key, value) {
       print(
-          "\x1B[31m[ERROR]: THE FOLLOWING KEY IS \x1B[1mUSED TO OFTEN\x1B[0m\x1B[31m : $key USAGE [$value]");
+          "\x1B[31m[ERROR]: THE FOLLOWING KEY IS \x1B[1mUSED TOO OFTEN\x1B[0m\x1B[31m : $key : USAGE [$value]");
     });
 
     notAllowedLineBreakList.forEach((key, value) {
       print(
-          "\x1B[31m[ERROR]: THE FOLLOWING KEY \x1B[1mCONTAINS NOT ALLOWED\x1B[0m\x1B[31m LINE BRAKE : $key INSIDE [$value]");
+          "\x1B[31m[ERROR]: THE FOLLOWING KEY \x1B[1mCONTAINS NOT ALLOWED\x1B[0m\x1B[31m LINE BRAKE : $key : INSIDE [$value]");
     });
 
     unusedMissingKeyMap.forEach((key, value) {
@@ -166,40 +188,66 @@ class CheckHelper {
   }
 
   static Future<bool> _isKeyUsedInLib(String key) async {
-    await for (var entity in Directory('lib').list(recursive: true)) {
-      if (entity is File) {
-        String content = await entity.readAsString();
-        if (content.contains(key)) {
-          return true;
+    try {
+      await for (var entity in Directory('lib').list(recursive: true)) {
+        if (entity is File) {
+          if (entity.path.contains('/.')) {
+            continue;
+          }
+          String content = "";
+          try {
+            content = await entity.readAsString();
+          } catch (e) {
+            ExceptionHandler.returnException(e);
+            continue;
+          }
+          if (content.contains(key)) {
+            return true;
+          }
         }
       }
+      return false;
+    } catch (e) {
+      ExceptionHandler.returnException(e);
     }
     return false;
   }
 
   static Future<int> _getUsageCount(String key) async {
     int count = 0;
-    await for (var entity in Directory('lib').list(recursive: true)) {
-      if (entity is File) {
-        String fileContent = await entity.readAsString();
-        RegExp regExp = RegExp(RegExp.escape(key));
-        Iterable<RegExpMatch> matches = regExp.allMatches(fileContent);
-        count += matches.length;
+    try {
+      await for (var entity in Directory('lib').list(recursive: true)) {
+        if (entity is File) {
+          if (entity.path.contains('/.')) {
+            continue;
+          }
+          String fileContent = await entity.readAsString();
+          RegExp regExp = RegExp(RegExp.escape(key));
+          Iterable<RegExpMatch> matches = regExp.allMatches(fileContent);
+          count += matches.length;
+        }
       }
+    } catch (e) {
+      ExceptionHandler.returnException(e);
     }
     return count;
   }
 
   ///Method converts [String] to [Map<String, String>] and returns it
   static Map<String, String> _convertStringToJson(String jsonAsString) {
-    Map<String, String>? jsonStrings;
+    try {
+      Map<String, String>? jsonStrings;
 
-    Map<String, dynamic> jsonAsMap = jsonDecode(jsonAsString);
+      Map<String, dynamic> jsonAsMap = jsonDecode(jsonAsString);
 
-    jsonStrings = jsonAsMap.map((key, value) {
-      return MapEntry(key, value.toString());
-    });
+      jsonStrings = jsonAsMap.map((key, value) {
+        return MapEntry(key, value.toString());
+      });
 
-    return jsonStrings;
+      return jsonStrings;
+    } catch (e) {
+      ExceptionHandler.returnException(e);
+    }
+    return {};
   }
 }
