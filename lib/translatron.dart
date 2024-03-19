@@ -3,7 +3,11 @@ library translatron;
 import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
+
 import 'package:flutter/widgets.dart';
+import 'package:translatron/exception/exception_handler.dart';
+import 'package:translatron/exception/exceptions/missing_api_params_exception.dart';
+import 'package:translatron/exception/exceptions/wrong_api_response_exception.dart';
 import 'package:translatron/translatron/api.dart';
 import 'package:translatron/translatron/delegate.dart';
 import 'package:translatron/translatron/file_storage.dart';
@@ -20,7 +24,7 @@ class Translatron {
   ///Stores the hostname[String] for api calls
   static late String _hostname;
 
-  ///Stores the versionpath[String] for api calls
+  ///Stores the versionPath[String] for api calls
   static late String _versionPath;
 
   ///Stores the translationsPath[String] for api calls
@@ -35,14 +39,14 @@ class Translatron {
   ///Stores the reLoadAtStart[bool] for reload assets at start
   static late bool _reLoadAtStart;
 
-  ///Notehing to see here
+  ///Nothing to see here
   Translatron(this.locale);
 
-  ///Notehing to see here
+  ///Nothing to see here
   static const LocalizationsDelegate<Translatron> delegate =
       TranslatronDelegate();
 
-  ///Returns the value of the key thats was provided
+  ///Returns the value of the key that was provided
   ///Excepts [String] containing the translation key
   ///Example:
   /// ```dart
@@ -52,12 +56,12 @@ class Translatron {
     return Localizations.of<Translatron>(context, Translatron);
   }
 
-  /// Retruns the selected [Locale]
+  /// Returns the selected [Locale]
   static Locale? get getSelectedLanguageLocale {
     return _selectedLocale;
   }
 
-  /// Retruns the reLoadAtStart [bool]
+  /// Returns the reLoadAtStart [bool]
   static bool? get reLoadAtStart {
     return _reLoadAtStart;
   }
@@ -113,12 +117,12 @@ class Translatron {
   /// - [List<Locale>] supportedLocales   -> defaults to: [Locale('hu')]
   /// - [Map<String, String>?] apiHeaders -> usage: set custom api headers for example auth Token,  defaults to: null
   static Future<void> init({
-    required String hostname,
-    required String versionPath,
-    required String translationsPath,
+    String hostname = "",
+    String versionPath = "",
+    String translationsPath = "",
     List<Locale> supportedLocales = const [Locale('hu')],
     Map<String, String>? apiHeaders,
-    bool hasWebserver = true,
+    bool hasWebServer = false,
     bool reLoadAtStart = false,
   }) async {
     _hostname = hostname;
@@ -128,16 +132,31 @@ class Translatron {
     _apiHeaders = apiHeaders;
     _reLoadAtStart = reLoadAtStart;
     await LocalStorage.loadLanguage();
-    if (hasWebserver) {
-      final bool isNewVersionAvailable = await Utils.isNewVersionAvailable();
-      if (isNewVersionAvailable) {
-        Map<String, dynamic> magick = await Api.fetchTranslations();
-        for (var locale in supportedLocales) {
-          FileStorage.saveLanguage(
-              locale, jsonEncode(magick["data"][locale.languageCode]));
+    try {
+      if (hasWebServer &&
+          hostname.isNotEmpty &&
+          versionPath.isNotEmpty &&
+          translationsPath.isNotEmpty) {
+        final bool isNewVersionAvailable = await Utils.isNewVersionAvailable();
+        if (isNewVersionAvailable) {
+          Map<String, dynamic>? magick = await Api.fetchTranslations();
+          if (magick == null) {
+            throw WrongApiResponseException();
+          }
+          for (var locale in supportedLocales) {
+            FileStorage.saveLanguage(
+                locale, jsonEncode(magick["data"][locale.languageCode]));
+          }
         }
+        LocalStorage.persistLanguageVersion(Utils.getTranslationVersion);
+      } else if (hasWebServer && hostname.isEmpty ||
+          versionPath.isEmpty ||
+          translationsPath.isEmpty) {
+        hasWebServer = false;
+        throw MissingApiParamsException();
       }
-      LocalStorage.persistLanguageVersion(Utils.getTranslationVersion);
+    } catch (e) {
+      ExceptionHandler.returnException(e);
     }
   }
 
