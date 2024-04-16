@@ -1,9 +1,10 @@
 import 'dart:core';
+
 import 'package:flutter/widgets.dart';
 import 'package:translatron/translatron.dart';
 
 class TranslatronDelegate extends LocalizationsDelegate<Translatron> {
-  ///Not too intersting
+  ///Not too interesting
   const TranslatronDelegate();
 
   /// Whether resources for the given locale can be loaded by this delegate.
