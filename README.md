@@ -1,5 +1,5 @@
 # Welcome to Translatron!
-![Static Badge](https://img.shields.io/badge/Version-1.1.0-blue)
+![Static Badge](https://img.shields.io/badge/Version-1.1.1-blue)
 ![Static Badge](https://img.shields.io/badge/License-MIT-green)
 ![Static Badge](https://img.shields.io/badge/Build-passing-green)
 

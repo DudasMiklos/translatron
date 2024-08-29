@@ -1,3 +1,11 @@
+## 1.1.2
+
+* dependencies update, minor bugfixes
+
+# 1.1.1
+
+* custom exceptions added
+
 ## 1.0.0
 
 * dart run translatron --stat command added and dart run translatron --check command added
