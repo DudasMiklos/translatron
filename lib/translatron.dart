@@ -149,9 +149,10 @@ class Translatron {
           }
         }
         LocalStorage.persistLanguageVersion(Utils.getTranslationVersion);
-      } else if (hasWebServer && hostname.isEmpty ||
-          versionPath.isEmpty ||
-          translationsPath.isEmpty) {
+      } else if (hasWebServer &&
+          (hostname.isEmpty ||
+              versionPath.isEmpty ||
+              translationsPath.isEmpty)) {
         hasWebServer = false;
         throw MissingApiParamsException();
       }

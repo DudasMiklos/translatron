@@ -44,14 +44,15 @@ class ExceptionHandler {
   static void returnException(Object e) {
     if (e is FileSystemException) {
       print(
-          "\u001B[31m${CustomFileSystemException().message} ${e.message}, path: ${e.path}\u001B[0m");
+          " \x1B[1m\u001B[31m[TRANSLATRON]: \x1B[0m\u001B[31m${CustomFileSystemException().message} ${e.message}, path: ${e.path}\u001B[0m");
       return;
     }
     if (e is CustomException) {
-      print("\u001B[31m${e.message}\u001B[0m");
+      print(
+          " \x1B[1m\u001B[31m[TRANSLATRON]: \x1B[0m\u001B[31m${e.message}\u001B[0m");
       return;
     }
     print(
-        "\u001B[31mAn unknown error occurred! Please try again later.\u001B[0m");
+        " \x1B[1m\u001B[31m[TRANSLATRON]: \x1B[0m\u001B[31mAn unknown error occurred! Please try again later.\u001B[0m");
   }
 }
